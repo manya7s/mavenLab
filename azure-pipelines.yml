@@ -1,8 +1,3 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
-
 trigger:
 - main
 
@@ -10,12 +5,20 @@ pool:
   vmImage: ubuntu-latest
 
 steps:
+- task: UseJava@1
+  inputs:
+    versionSpec: '17'
+    jdkArchitecture: 'x64'
+
+- script: java -version
+  displayName: 'Show Java version'
+
 - task: Maven@3
   inputs:
     mavenPomFile: 'pom.xml'
     mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.17'
+    javaHomeOption: 'Path'  # Important: Use the Java path set by UseJava@1
+    jdkDirectory: $(JAVA_HOME)
     jdkArchitectureOption: 'x64'
     publishJUnitResults: true
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
